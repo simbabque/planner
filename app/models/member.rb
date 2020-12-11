@@ -96,6 +96,13 @@ class Member < ActiveRecord::Base
                         .sort_by { |i| i.event.date_and_time }
   end
 
+  def past_rsvps
+    @past_rsvps ||= (invitations.joins(:event).past_rsvps +
+                    workshop_invitations.joins(:workshop).includes(workshop: :chapter).past_rsvps +
+                    meeting_invitations.joins(:meeting).past_rsvps)
+                    .sort_by { |i| i.event.date_and_time }.reverse
+  end
+
   def flag_to_organisers?
     multiple_no_shows? && attendance_warnings.last_six_months.length >= 2
   end
